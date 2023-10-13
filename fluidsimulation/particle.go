@@ -39,28 +39,54 @@ func (part *Particle) RecalculateForces(parts []*Particle, height, width float64
 	if gravity {
 		part.Forces = append(part.Forces, Vector2{
 			X: 0,
-			Y: 0.5,
+			Y: 0.2,
 		})
 	}
 	part.CalculateInterParticleRepulsion(parts)
-	part.CalculateBoundaryRepulsion(height, width)
+	part.getBoundaryRepulsion()
 }
 
 func (part *Particle) CalculateInterParticleRepulsion(parts []*Particle) {
 	for _, p := range parts {
 		var distance = part.Position.GetDistance(p.Position)
 		if distance > 0.000001 {
-			var forceVector = part.Position.GetUnitDirection(p.Position).ScalarDivide(math.Pow(part.Position.GetDistance(p.Position), 3))
+			var scalingFactor = getForceScalingFactorFromDistance(distance)
+			var forceVector = part.Position.GetUnitDirection(p.Position).ScalarMultiply(scalingFactor)
 			part.Forces = append(part.Forces, forceVector)
 		}
 	}
 }
 
-func (part *Particle) CalculateBoundaryRepulsion(height, width float64) {
-	var verticalForceFactor = height/2 - part.Position.Y
-	var horizontalForceFactor = width/2 - part.Position.X
-	part.Forces = append(part.Forces, Vector2{
-		X: 1 / horizontalForceFactor,
-		Y: 1 / verticalForceFactor,
-	})
+func getForceScalingFactorFromDistance(distance float64) float64 {
+	var closeness = 100 - distance
+	if closeness < 0 {
+		return 0
+	} else {
+		return math.Pow(closeness, 3) / 1000000
+	}
+}
+
+func (part *Particle) getBoundaryRepulsion() {
+	if part.Position.X < 25 {
+		part.Forces = append(part.Forces, Vector2{
+			X: getForceScalingFactorFromDistance(part.Position.X * 4),
+			Y: 0,
+		})
+	} else if 1080-part.Position.X < 25 {
+		part.Forces = append(part.Forces, Vector2{
+			X: -getForceScalingFactorFromDistance((1080 - part.Position.X) * 4),
+			Y: 0,
+		})
+	}
+	if part.Position.Y < 25 {
+		part.Forces = append(part.Forces, Vector2{
+			X: 0,
+			Y: getForceScalingFactorFromDistance(part.Position.Y * 4),
+		})
+	} else if 720-part.Position.Y < 25 {
+		part.Forces = append(part.Forces, Vector2{
+			X: 0,
+			Y: -getForceScalingFactorFromDistance((720 - part.Position.Y) * 4),
+		})
+	}
 }

@@ -20,7 +20,7 @@ const (
 
 var (
 	particles             = []*fluidsimulation.Particle{}
-	numberOfParticles     = 20
+	numberOfParticles     = 500
 	bounceDampeningFactor = 0.8
 	paused                = false
 	isGravity             = false
