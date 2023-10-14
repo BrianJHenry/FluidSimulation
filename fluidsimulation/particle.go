@@ -7,17 +7,17 @@ type Particle struct {
 	Forces          []Vector2
 }
 
-func (part *Particle) ApplyAcceleration() {
+func ApplyAcceleration(part *Particle) {
 	for _, force := range part.Forces {
 		part.Speed = part.Speed.Add(force)
 	}
 }
 
-func (part *Particle) ApplyMovement() {
+func ApplyMovement(part *Particle) {
 	part.Position = part.Position.Add(part.Speed)
 }
 
-func (part *Particle) CheckCollisionWithEdges(bounceDampeningFactor, screenWidth, screenHeight float64) {
+func CheckCollisionWithEdges(part *Particle, bounceDampeningFactor, screenWidth, screenHeight float64) {
 	if part.Position.X > screenWidth {
 		part.Position.X = screenWidth
 		part.Speed.X *= -1 * bounceDampeningFactor
@@ -34,7 +34,8 @@ func (part *Particle) CheckCollisionWithEdges(bounceDampeningFactor, screenWidth
 	}
 }
 
-func (part *Particle) RecalculateForces(parts []*Particle, height, width float64, gravity bool) {
+func RecalculateForces(index int, parts []*Particle, height, width float64, gravity bool) {
+	var part = parts[index]
 	part.Forces = []Vector2{}
 	if gravity {
 		part.Forces = append(part.Forces, Vector2{
@@ -42,14 +43,15 @@ func (part *Particle) RecalculateForces(parts []*Particle, height, width float64
 			Y: 0.2,
 		})
 	}
-	part.CalculateInterParticleRepulsion(parts)
-	part.getBoundaryRepulsion()
+	CalculateInterParticleRepulsion(index, parts)
+	getBoundaryRepulsion(part)
 }
 
-func (part *Particle) CalculateInterParticleRepulsion(parts []*Particle) {
-	for _, p := range parts {
-		var distance = part.Position.GetDistance(p.Position)
-		if distance > 0.000001 {
+func CalculateInterParticleRepulsion(index int, parts []*Particle) {
+	var part = parts[index]
+	for i, p := range parts {
+		if i != index {
+			var distance = part.Position.GetDistance(p.Position)
 			var scalingFactor = getForceScalingFactorFromDistance(distance)
 			var forceVector = part.Position.GetUnitDirection(p.Position).ScalarMultiply(scalingFactor)
 			part.Forces = append(part.Forces, forceVector)
@@ -66,7 +68,7 @@ func getForceScalingFactorFromDistance(distance float64) float64 {
 	}
 }
 
-func (part *Particle) getBoundaryRepulsion() {
+func getBoundaryRepulsion(part *Particle) {
 	if part.Position.X < 25 {
 		part.Forces = append(part.Forces, Vector2{
 			X: getForceScalingFactorFromDistance(part.Position.X * 4),

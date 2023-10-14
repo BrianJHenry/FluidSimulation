@@ -41,32 +41,32 @@ func ResetParticles() {
 				Y: 0,
 			},
 		}
-		newParticle.RecalculateForces([]*Particle{}, ScreenHeight, ScreenWidth, IsGravity)
+		RecalculateForces(0, []*Particle{&newParticle}, ScreenHeight, ScreenWidth, IsGravity)
 		Particles = append(Particles, &newParticle)
 	}
 }
 
 func recalculateForces() {
-	for _, part := range Particles {
-		part.RecalculateForces(Particles, ScreenHeight, ScreenWidth, IsGravity)
+	for i := range Particles {
+		RecalculateForces(i, Particles, ScreenHeight, ScreenWidth, IsGravity)
 	}
 }
 
 func applyAcceleration() {
 	for _, part := range Particles {
-		part.ApplyAcceleration()
+		ApplyAcceleration(part)
 	}
 }
 
 func applyMovement() {
 	for _, part := range Particles {
-		part.ApplyMovement()
+		ApplyMovement(part)
 	}
 	checkCollideWithEdges()
 }
 
 func checkCollideWithEdges() {
 	for _, part := range Particles {
-		part.CheckCollisionWithEdges(BounceDampeningFactor, ScreenWidth, ScreenHeight)
+		CheckCollisionWithEdges(part, BounceDampeningFactor, ScreenWidth, ScreenHeight)
 	}
 }
