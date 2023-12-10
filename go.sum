@@ -4,6 +4,12 @@ github.com/hajimehoshi/ebiten/v2 v2.6.1 h1:ljYS8zp6jp9lFd0zR/2vsIK4Km90/WvTEmxDG
 github.com/hajimehoshi/ebiten/v2 v2.6.1/go.mod h1:TZtorL713an00UW4LyvMeKD8uXWnuIuCPtlH11b0pgI=
 github.com/jezek/xgb v1.1.0 h1:wnpxJzP1+rkbGclEkmwpVFQWpuE2PUGNUzP8SbfFobk=
 github.com/jezek/xgb v1.1.0/go.mod h1:nrhwO0FX/enq75I7Y7G8iN1ubpSGZEiA3v9e9GyRFlk=
+github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=
+github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
+github.com/mazznoer/colorgrad v0.9.1 h1:MB80JYVndKWSMEM1beNqnuOowWGhoQc3DXWXkFp6JlM=
+github.com/mazznoer/colorgrad v0.9.1/go.mod h1:WX2R9wt9B47+txJZVVpM9LY+LAGIdi4lTI5wIyreDH4=
+github.com/mazznoer/csscolorparser v0.1.2 h1:/UBHuQg792ePmGFzTQAC9u+XbFr7/HzP/Gj70Phyz2A=
+github.com/mazznoer/csscolorparser v0.1.2/go.mod h1:Aj22+L/rYN/Y6bj3bYqO3N6g1dtdHtGfQ32xZ5PJQic=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image/color"
 	"log"
 
 	"github.com/BrianJHenry/FluidSimulation/fluidsimulation"
@@ -19,7 +18,7 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, part := range fluidsimulation.Particles {
-		vector.DrawFilledCircle(screen, float32(part.Position.X), float32(part.Position.Y), 8, color.White, false)
+		vector.DrawFilledCircle(screen, float32(part.Position.X), float32(part.Position.Y), 8, part.Color, false)
 	}
 }
 
