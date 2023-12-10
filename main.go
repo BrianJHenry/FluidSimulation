@@ -13,12 +13,12 @@ type Game struct{}
 
 func (g *Game) Update() error {
 	getInputs()
-	return fluidsimulation.UpdateSimulation()
+	return fluidsimulation.UpdateParticles()
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, part := range fluidsimulation.Particles {
-		vector.DrawFilledCircle(screen, float32(part.Position.X), float32(part.Position.Y), 8, part.Color, false)
+		vector.DrawFilledCircle(screen, float32(part.Position.X), float32(part.Position.Y), float32(fluidsimulation.ParticleRadius), part.Color, false)
 	}
 }
 

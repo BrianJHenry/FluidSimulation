@@ -35,7 +35,7 @@ func (v1 Vector2) ScalarDivide(scalar float64) (Vector2, error) {
 		return Vector2{
 			X: 0,
 			Y: 0,
-		}, errors.New("No division by 0.")
+		}, errors.New("no division by 0")
 	}
 	return Vector2{
 		X: v1.X / scalar,
@@ -56,9 +56,9 @@ func (v Vector2) Magnitude() float64 {
 }
 
 func (v1 Vector2) GetUnitDirection(v2 Vector2) Vector2 {
-	var unnormalized = v1.Subtract(v2)
-	var mag = unnormalized.Magnitude()
-	unitDirection, _ := unnormalized.ScalarDivide(mag)
+	var differenceVector = v1.Subtract(v2)
+	var magnitude = differenceVector.Magnitude()
+	unitDirection, _ := differenceVector.ScalarDivide(magnitude)
 	return unitDirection
 }
 

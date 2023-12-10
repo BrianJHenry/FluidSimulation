@@ -14,20 +14,24 @@ const (
 )
 
 var (
-	Particles                     = []*Particle{}
-	NumberOfParticles             = 500
-	BounceDampeningFactor         = 0.8
-	Paused                        = false
-	IsGravity                     = false
-	ParticleColors                = colorgrad.Cividis()
-	ParticleColorScale    float64 = 7
+	Particles                           = []*Particle{}
+	NumberOfParticles                   = 500
+	BounceDampeningFactor               = 0.8
+	Paused                              = false
+	IsGravity                           = false
+	ParticleColors                      = colorgrad.Cividis()
+	ParticleRadius                      = 7
+	ParticleRadiusOfInfluence   float64 = 100
+	BoundaryDistanceOfInfluence float64 = 25
+	ParticleColorScale          float64 = 7
 )
 
-func UpdateSimulation() error {
+func UpdateParticles() error {
 	if !Paused {
-		recalculateForces()
-		appyForces()
-		applyVelocity()
+		recalculateForcesForParticles()
+		applyForcesToParticles()
+		applyColorToParticles()
+		applyVelocityToParticles()
 	}
 	return nil
 }
@@ -53,34 +57,40 @@ func ResetParticles() {
 	}
 }
 
-func recalculateForces() {
+func recalculateForcesForParticles() {
 	for i := range Particles {
 		RecalculateForces(i, Particles, ScreenHeight, ScreenWidth, IsGravity)
 	}
 }
 
-func appyForces() {
+func applyForcesToParticles() {
 	var forceWait sync.WaitGroup
 	forceWait.Add(len(Particles))
 	for _, part := range Particles {
 		// Update velocity
 		go func(particle *Particle) {
-			ApplyForces(particle)
+			applyForces(particle)
 			forceWait.Done()
 		}(part)
 	}
 	forceWait.Wait()
 }
 
-func applyVelocity() {
+func applyColorToParticles() {
 	for _, part := range Particles {
-		ApplyVelocity(part)
+		applyColor(part)
 	}
-	checkCollisionWithEdges()
 }
 
-func checkCollisionWithEdges() {
+func applyVelocityToParticles() {
 	for _, part := range Particles {
-		CheckCollisionWithEdges(part, BounceDampeningFactor, ScreenWidth, ScreenHeight)
+		applyVelocity(part)
+	}
+	checkCollisionWithEdgesForParticles()
+}
+
+func checkCollisionWithEdgesForParticles() {
+	for _, part := range Particles {
+		checkCollisionWithEdges(part, BounceDampeningFactor, ScreenWidth, ScreenHeight)
 	}
 }
