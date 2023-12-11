@@ -6,14 +6,7 @@ import (
 
 type Particle struct {
 	Position, Velocity Vector2
-	Forces             []Vector2
 	Color              color.Color
-}
-
-func applyForces(part *Particle) {
-	for _, force := range part.Forces {
-		part.Velocity = part.Velocity.Add(force)
-	}
 }
 
 func applyVelocity(part *Particle) {
@@ -48,52 +41,27 @@ func checkCollisionWithEdges(part *Particle, bounceDampingFactor, screenWidth, s
 	}
 }
 
-func RecalculateForces(index int, particles []*Particle, height, width float64, gravity bool) {
-	var part = particles[index]
-	part.Forces = []Vector2{}
-	if gravity {
-		part.Forces = append(part.Forces, Vector2{
-			X: 0,
-			Y: 0.2,
-		})
-	}
-	CalculateInterParticleRepulsion(index, particles)
-	getBoundaryRepulsion(part)
-}
-
-func CalculateInterParticleRepulsion(index int, particles []*Particle) {
-	var part = particles[index]
-	for i, p := range particles {
-		if i != index {
-			var distance = part.Position.GetDistance(p.Position)
-			var scalingFactor = sqdDifferenceCubedSmoothingKernel(ParticleRadiusOfInfluence, distance)
-			var forceVector = part.Position.GetUnitDirection(p.Position).ScalarMultiply(scalingFactor)
-			part.Forces = append(part.Forces, forceVector)
-		}
-	}
-}
-
-func getBoundaryRepulsion(part *Particle) {
-	if part.Position.X < BoundaryDistanceOfInfluence {
-		part.Forces = append(part.Forces, Vector2{
-			X: sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, part.Position.X),
-			Y: 0,
-		})
-	} else if ScreenWidth-part.Position.X < BoundaryDistanceOfInfluence {
-		part.Forces = append(part.Forces, Vector2{
-			X: -sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, ScreenWidth-part.Position.X),
-			Y: 0,
-		})
-	}
-	if part.Position.Y < BoundaryDistanceOfInfluence {
-		part.Forces = append(part.Forces, Vector2{
-			X: 0,
-			Y: sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, part.Position.Y),
-		})
-	} else if ScreenHeight-part.Position.Y < BoundaryDistanceOfInfluence {
-		part.Forces = append(part.Forces, Vector2{
-			X: 0,
-			Y: -sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, ScreenHeight-part.Position.Y),
-		})
-	}
-}
+// func getBoundaryRepulsion(part *Particle) {
+// 	if part.Position.X < BoundaryDistanceOfInfluence {
+// 		part.Forces = append(part.Forces, Vector2{
+// 			X: sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, part.Position.X),
+// 			Y: 0,
+// 		})
+// 	} else if ScreenWidth-part.Position.X < BoundaryDistanceOfInfluence {
+// 		part.Forces = append(part.Forces, Vector2{
+// 			X: -sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, ScreenWidth-part.Position.X),
+// 			Y: 0,
+// 		})
+// 	}
+// 	if part.Position.Y < BoundaryDistanceOfInfluence {
+// 		part.Forces = append(part.Forces, Vector2{
+// 			X: 0,
+// 			Y: sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, part.Position.Y),
+// 		})
+// 	} else if ScreenHeight-part.Position.Y < BoundaryDistanceOfInfluence {
+// 		part.Forces = append(part.Forces, Vector2{
+// 			X: 0,
+// 			Y: -sqdDifferenceCubedSmoothingKernel(BoundaryDistanceOfInfluence, ScreenHeight-part.Position.Y),
+// 		})
+// 	}
+// }

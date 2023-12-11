@@ -47,7 +47,7 @@ func getInputs() {
 		println("Reset")
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyG) {
-		fluidsimulation.IsGravity = !fluidsimulation.IsGravity
+		fluidsimulation.HasGravity = !fluidsimulation.HasGravity
 		println("Gravity Toggled")
 	}
 }

@@ -9,16 +9,17 @@ import (
 )
 
 const (
-	ScreenWidth  = 1080
-	ScreenHeight = 720
+	ScreenWidth   = 1080
+	ScreenHeight  = 720
+	ParticleCount = 200
 )
 
 var (
-	Particles                           = []*Particle{}
-	NumberOfParticles                   = 500
+	Particles                           = [ParticleCount]*Particle{}
+	Densities                           = [ParticleCount]float64{}
 	BounceDampeningFactor               = 0.8
 	Paused                              = false
-	IsGravity                           = false
+	HasGravity                          = false
 	ParticleColors                      = colorgrad.Cividis()
 	ParticleRadius                      = 7
 	ParticleRadiusOfInfluence   float64 = 100
@@ -28,8 +29,11 @@ var (
 
 func UpdateParticles() error {
 	if !Paused {
-		recalculateForcesForParticles()
-		applyForcesToParticles()
+		if HasGravity {
+			applyGravity()
+		}
+		calculateDensities()
+		calculateVelocityGradientsForParticles()
 		applyColorToParticles()
 		applyVelocityToParticles()
 	}
@@ -37,9 +41,8 @@ func UpdateParticles() error {
 }
 
 func ResetParticles() {
-	Particles = []*Particle{}
-	var interval = float64(ScreenWidth) / float64(NumberOfParticles+2)
-	for i := 0; i < NumberOfParticles; i++ {
+	var interval = float64(ScreenWidth) / float64(ParticleCount+2)
+	for i := 0; i < ParticleCount; i++ {
 		var height = rand.Float64()
 		var newParticle = Particle{
 			Position: Vector2{
@@ -52,45 +55,65 @@ func ResetParticles() {
 			},
 			Color: color.White,
 		}
-		RecalculateForces(0, []*Particle{&newParticle}, ScreenHeight, ScreenWidth, IsGravity)
-		Particles = append(Particles, &newParticle)
+		Particles[i] = &newParticle
 	}
 }
 
-func recalculateForcesForParticles() {
-	for i := range Particles {
-		RecalculateForces(i, Particles, ScreenHeight, ScreenWidth, IsGravity)
-	}
-}
-
-func applyForcesToParticles() {
-	var forceWait sync.WaitGroup
-	forceWait.Add(len(Particles))
+func applyGravity() {
 	for _, part := range Particles {
-		// Update velocity
-		go func(particle *Particle) {
-			applyForces(particle)
-			forceWait.Done()
-		}(part)
+		part.Velocity = part.Velocity.Add(Vector2{
+			X: 0,
+			Y: 0.2,
+		})
 	}
-	forceWait.Wait()
+}
+
+func calculateDensities() {
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(ParticleCount)
+	for i, part := range Particles {
+		go func(i int, part *Particle) {
+			Densities[i] = CalculateDensity(part)
+			waitGroup.Done()
+		}(i, part)
+	}
+	waitGroup.Wait()
+}
+
+func calculateVelocityGradientsForParticles() {
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(ParticleCount)
+	for i, part := range Particles {
+		go func(i int, part *Particle) {
+			var velocityGradient = CalculatePressureGradient(i)
+			part.Velocity = part.Velocity.Add(velocityGradient)
+			waitGroup.Done()
+		}(i, part)
+	}
+	waitGroup.Wait()
 }
 
 func applyColorToParticles() {
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(ParticleCount)
 	for _, part := range Particles {
-		applyColor(part)
+		func(part *Particle) {
+			applyColor(part)
+			waitGroup.Done()
+		}(part)
 	}
+	waitGroup.Wait()
 }
 
 func applyVelocityToParticles() {
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(ParticleCount)
 	for _, part := range Particles {
-		applyVelocity(part)
+		func(part *Particle) {
+			applyVelocity(part)
+			checkCollisionWithEdges(part, BounceDampeningFactor, ScreenWidth, ScreenHeight)
+			waitGroup.Done()
+		}(part)
 	}
-	checkCollisionWithEdgesForParticles()
-}
-
-func checkCollisionWithEdgesForParticles() {
-	for _, part := range Particles {
-		checkCollisionWithEdges(part, BounceDampeningFactor, ScreenWidth, ScreenHeight)
-	}
+	waitGroup.Wait()
 }
